@@ -11,13 +11,19 @@ editor: visual
 
 D'où viennent les joueurs du XV de France ?
 
-Cette carte visualise chaque joueur du XV de France selon son lieu de naissance et la date de sa première sélection.
 
-Elle est accompagnée d'un tableau qui recense le nombre d'internationaux pour chaque lieu de naissance, selon la période choisie.
+Cette carte visualise chaque joueur du XV de France selon son lieu de naissance et la date de sa première sélection. 
+
+
+Elle est accompagnée d'un tableau qui recense le nombre d'internationaux pour chaque lieu de naissance, selon la période choisie. 
+
 
 Les données ont été extraites de [Wikipedia](https://fr.wikipedia.org/wiki/Liste_des_s%C3%A9lectionn%C3%A9s_en_%C3%A9quipe_de_France_de_rugby_%C3%A0_XV), puis geocodées via OpenStreetMap.
 
+
 Bonne exploration !
+
+
 
 ```{r}
 #| echo: false
@@ -35,6 +41,7 @@ ojs_define(xv_str = sf_geojson(xv))
 
 ```
 
+
 ```{ojs}
 //| echo: false
 players = JSON.parse(xv_str) 
@@ -46,7 +53,7 @@ cartoAttr = `&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetM
 
 import {interval} from '@mootari/range-slider' 
 
-viewof period = interval([1900, 2023], {
+viewof period = interval([1906, 2023], {
   step: 1,
   min: 1906,
   max: 2023,
@@ -61,7 +68,7 @@ d.first_year < period[1])
 
 VanCircleFoodMap = {
 
-  let width = 1200;
+  let width = 800;
   let container = DOM.element('div', { style: `width:${width}px;height:${width/1.6}px` });
   
   yield container;
@@ -108,13 +115,16 @@ VanCircleFoodMap = {
 
 <br>
 
+
 ```{ojs}
 data1 = geo.table(newplayers)
 
 
 Plot.plot({
-  marginYop: 500,
-  marginLeft: 200,
+  width: 800,
+  height: 4000,
+  marginTop: 50,
+  marginLeft: 100,
   marginBottom: 100,
   x: {
   label: "Nombre d'internationaux", 

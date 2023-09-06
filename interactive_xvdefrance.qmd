@@ -21,7 +21,9 @@ Elle est accompagnée d'un tableau qui recense le nombre d'internationaux pour c
 Les données ont été extraites de [Wikipedia](https://fr.wikipedia.org/wiki/Liste_des_s%C3%A9lectionn%C3%A9s_en_%C3%A9quipe_de_France_de_rugby_%C3%A0_XV), puis geocodées via OpenStreetMap.
 
 
-Bonne exploration !
+Ce n'est qu'une petite ébauche, dans l'attente de quelques améliorations.
+
+Bonne exploration  !
 
 
 

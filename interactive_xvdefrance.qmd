@@ -1,6 +1,6 @@
 ---
 title: "Géographie du XV de France"
-subtitle: "Une équipe du monde entier"
+subtitle: "Les Bleus, une équipe du monde entier"
 author: "Julien Migozzi"
 institute: "University of Oxford"
 format:
@@ -11,19 +11,22 @@ editor: visual
 
 D'où viennent les joueurs du XV de France ?
 
+Cette carte visualise tous les joueurs qui ont porté le maillot du XV de France selon leur lieu de naissance et la date de leur première sélection, de 1906 à 2023. Sur ces 1165 internationaux, 1107 ont pu être cartographiés en utilisant les données de [Wikipedia](https://fr.wikipedia.org/wiki/Liste_des_s%C3%A9lectionn%C3%A9s_en_%C3%A9quipe_de_France_de_rugby_%C3%A0_XV). 
 
-Cette carte visualise chaque joueur du XV de France selon son lieu de naissance et la date de sa première sélection. 
+Trois tableaux recensent le nombre d'internationaux pour chaque lieu de naissance, selon la période choisie, à l'échelle des villes, régions ou pays.
+
+Plusieurs clés de lectures apparaissent : 
+
+- un recrutement international dès l'origine du XV de France (Russie, Angleterre, Argentine etc.) ;
+- le poids historique du Sud-Ouest (Pyrénées-Atlantiques, Haute-Garonne etc.), mais aussi celui de Paris, 2e ville après Toulouse ;
+- les héritages coloniaux de la présence française, notamment en Afrique (Algérie, Cameroun, Côte d'Ivoire etc.) ou en Océanie (Nouvelle-Calédonie, Wallis et Futuna) ; 
+- le rôle majeur des petites villes et bourgades jusque dans les années 1990 ;
+- la métropolisation du recrutement des joueurs, qui proviennent de plus en plus des grandes villes ces 20 dernières années ; 
+- la professionnalisation du rugby, qui entraine l'arrivée de joueurs en provenance d'Afrique du Sud (2e pays le plus représenté) ou de Nouvelle-Zélande.
 
 
-Elle est accompagnée d'un tableau qui recense le nombre d'internationaux pour chaque lieu de naissance, selon la période choisie. 
 
-
-Les données ont été extraites de [Wikipedia](https://fr.wikipedia.org/wiki/Liste_des_s%C3%A9lectionn%C3%A9s_en_%C3%A9quipe_de_France_de_rugby_%C3%A0_XV), puis geocodées via OpenStreetMap.
-
-
-Ce n'est qu'une petite ébauche, dans l'attente de quelques améliorations.
-
-Bonne exploration  !
+Ce site n'est qu'une petite ébauche : en attendant quelques améliorations, bonne exploration  !
 
 
 
@@ -33,11 +36,14 @@ Bonne exploration  !
 #| message: false
 
 library(sf)
-
 library(tidyverse)
 xv <- st_read(here::here("data/xvdefrance.gpkg"),  quiet = TRUE)
 xv$first_year <- as.numeric(format(xv$first_selection,'%Y'))
-# glimpse(xv)
+
+xv <-  xv %>% 
+   st_jitter(factor = 0.00002) # avoid overlapping of points
+
+
 library(geojsonsf)
 ojs_define(xv_str = sf_geojson(xv))
 
@@ -59,18 +65,18 @@ viewof period = interval([1906, 2023], {
   step: 1,
   min: 1906,
   max: 2023,
-  value: [2015, 2023],
+  value: [1906, 2023],
   label: 'Période de la première sélection',
 })
 
 
-newplayers = geo.filter(players, (d) => d.first_year > period[0] &
-d.first_year < period[1])
+newplayers = geo.filter(players, (d) => d.first_year >= period[0] &
+d.first_year <= period[1])
 
 
-VanCircleFoodMap = {
+VanCirclePlayersMap = {
 
-  let width = 800;
+  let width = 700;
   let container = DOM.element('div', { style: `width:${width}px;height:${width/1.6}px` });
   
   yield container;
@@ -88,7 +94,7 @@ VanCircleFoodMap = {
 
   //geoMarker obj
   let geojsonMarkerOptions = {
-    radius: 5,
+    radius: 4,
     fillColor: "#ff7800",
     color: "#ff7800",
     weight: 1,
@@ -104,7 +110,7 @@ VanCircleFoodMap = {
         return L.circleMarker(latlng, geojsonMarkerOptions);
     }})
   .bindPopup(function (Layer) { 
-    return Layer.feature.properties.nom + '<br> Selections: ' + Layer.feature.properties.matchs+ '<br> Lieu de naissance: ' + Layer.feature.properties.city; 
+    return Layer.feature.properties.nom + '<br> Sélections: ' + Layer.feature.properties.matchs+ '<br> Lieu de naissance: ' + Layer.feature.properties.city +'<br> Premier match' +  Layer.feature.properties.premiere_selection + '<br> Naissance: ' + Layer.feature.properties.dob; 
   })  
   .addTo(map);
 
@@ -121,15 +127,64 @@ VanCircleFoodMap = {
 ```{ojs}
 data1 = geo.table(newplayers)
 
+extract = geo.filter(newplayers, (d) => d.country != "France")
+data2 = geo.table(extract)
 
 Plot.plot({
   width: 800,
+  height: 500,
+  marginTop: 50,
+  marginLeft: 100,
+  marginBottom: 100,
+  x: {
+  label: "Pays de naissance (hors France)", 
+  axis: "top",
+  tip: true,
+  tickRotate: 0
+  },
+  y: {
+  label: "",
+  grid: true
+  },
+  marks: [
+      Plot.barX(data2, Plot.groupY({x: "count"}, {y: "country", sort: {y: "x", reverse: true}})),
+
+    Plot.ruleY([0])
+  ]
+})
+
+
+Plot.plot({
+  width: 1200,
+  height: 1500,
+  marginTop: 50,
+  marginLeft: 100,
+  marginBottom: 100,
+  x: {
+  label: "Région de naissance", 
+  axis: "top",
+  tickRotate: 0
+  },
+  y: {
+  label: "",
+  grid: true
+  },
+  marks: [
+      Plot.barX(data1, Plot.groupY({x: "count"}, {y: "region", sort: {y: "x", reverse: true}})),
+    Plot.ruleY([0])
+  ],
+  tip: true
+})
+
+
+Plot.plot({
+  width: 1200,
   height: 4000,
   marginTop: 50,
   marginLeft: 100,
   marginBottom: 100,
   x: {
-  label: "Nombre d'internationaux", 
+  label: "Lieu de naissance", 
   axis: "top",
   tickRotate: 0
   },
@@ -143,7 +198,5 @@ Plot.plot({
     Plot.ruleY([0])
   ]
 })
-
-
 
 ```

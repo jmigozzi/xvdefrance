@@ -155,7 +155,7 @@ Plot.plot({
 
 
 Plot.plot({
-  width: 1200,
+  width: 800,
   height: 1500,
   marginTop: 50,
   marginLeft: 100,
@@ -178,7 +178,7 @@ Plot.plot({
 
 
 Plot.plot({
-  width: 1200,
+  width: 600,
   height: 4000,
   marginTop: 50,
   marginLeft: 100,
